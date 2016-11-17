@@ -7,34 +7,34 @@ module ToyRobot
     DIRECTIONS = {
       north: {
         move:  [0, 1],
-        left:  DIRECTIONS[:west],
-        right: DIRECTIONS[:east],
-        value: 'NORTH',
+        left:  :west,
+        right: :east,
+        value: "NORTH",
       },
       east: {
         move:  [1, 0],
-        left:  DIRECTIONS[:north],
-        right: DIRECTIONS[:south],
-        value: 'EAST',
+        left:  :north,
+        right: :south,
+        value: "EAST",
       },
       south: {
         move:  [0, -1],
-        left:  DIRECTIONS[:east],
-        right: DIRECTIONS[:west],
-        value: 'SOUTH',
+        left:  :east,
+        right: :west,
+        value: "SOUTH",
       },
       west: {
         move:  [-1, 0],
-        left:  DIRECTIONS[:south],
-        right: DIRECTIONS[:north],
-        value: 'WEST',
+        left:  :south,
+        right: :north,
+        value: "WEST",
       },
     }
 
     MIN_X = 0
     MIN_Y = 0
-    MAX_X = ENV['GRID_SIZE'] - 1
-    MAX_Y = ENV['GRID_SIZE'] - 1
+    MAX_X = (ENV["GRID_SIZE"] || 5).to_i - 1
+    MAX_Y = (ENV["GRID_SIZE"] || 5).to_i - 1
 
     def initialize
       @position  = nil
@@ -44,9 +44,10 @@ module ToyRobot
     # place on the grid at (x, y) in direction f
     def place(x, y, f)
       new_position = [x, y]
-      return unless valid_position?(new_position)
+      return self unless valid_position?(*new_position)
       @position   = new_position
       @direction  = DIRECTIONS[f.downcase.to_sym]
+      self
     end
 
     # move 1 unit forward in current direction
@@ -56,23 +57,26 @@ module ToyRobot
         @position[0] + @direction[:move][0],
         @position[1] + @direction[:move][1] ]
 
-      return unless valid_position?(new_position)
+      return self unless valid_position?(*new_position)
       @position = new_position
+      self
     end
 
     # rotate 90° anti-clockwise
     def left
-      @direction = @direction[:left]
+      @direction = DIRECTIONS[@direction[:left]]
+      self
     end
 
     # rotate 90° clockwise
     def right
-      @direction = @direction[:right]
+      @direction = DIRECTIONS[@direction[:right]]
+      self
     end
 
     # return position and direction
     def report
-      @position + @direction[:value]
+      position + [direction]
     end
 
     def position
@@ -80,12 +84,12 @@ module ToyRobot
     end
 
     def direction
-      @direction[:value]
+      @direction && @direction[:value]
     end
 
     private
 
-    def valid_position?([x, y])
+    def valid_position?(x, y)
       x.between?(MIN_X, MAX_X) && y.between?(MIN_Y, MAX_Y)
     end
   end
