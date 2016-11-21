@@ -52,6 +52,8 @@ describe ToyRobot do
     let(:cmd) { "./bin/toy_robot.rb -i ./spec/fixtures/test_input.txt -o ./spec/fixtures/unwritable.txt" }
     let(:write_error) { "ERROR: Unable to open file ./spec/fixtures/unwritable.txt for writing.\nWriting output to standard output.\n" }
 
+    before { `chmod 444 ./spec/fixtures/unwritable.txt` }
+
     it "falls back to stdout" do
       expect {
         system(*cmd)
